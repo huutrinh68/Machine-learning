@@ -109,7 +109,7 @@ price = 0; % You should change this
 X = [1650 3];
 X = (X .- mu) ./ sigma;
 X = [ones(1,1) X];
-price = X * theta;
+price = X*theta;
 
 % ============================================================
 
