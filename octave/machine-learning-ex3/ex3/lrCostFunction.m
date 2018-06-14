@@ -36,6 +36,16 @@ grad = zeros(size(theta));
 %           grad = grad + YOUR_CODE_HERE (using the temp variable)
 %
 
+% Calculate cost function
+h = sigmoid(X*theta);
+
+% Calculate penalty
+theta1 = [0; theta(2:end, :)];
+p = lambda*(theta1'*theta1)/(2*m);
+J= ((-y)'*log(h) - (1-y)'*log(1-h))/m + p;
+
+% Calculate grads
+grad = (X'*(h-y) + lambda*theta1)/m;
 
 
 
