@@ -38,6 +38,41 @@ Theta2_grad = zeros(size(Theta2));
 %         variable J. After implementing Part 1, you can verify that your
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
+
+k = num_labels;
+
+% initialize Y as the classification output
+diagonal = eye(k);
+Y = diagonal(y, :);
+
+% forward propagation to get h(x)
+bias1 = ones(m, 1);
+a1 = [bias1 X];
+
+z2 = a1 * Theta1';
+bias2 = ones(size(z2, 1), 1);
+a2 = [bias2 sigmoid(z2)];
+
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+hx = a3;
+
+J =  (-1/m) * sum(sum(Y .* log(hx) + ((1-Y) .* log(1-hx))));
+
+% regularized cost function
+
+s1 = input_layer_size;    % 400
+s2 = hidden_layer_size;   % 25
+s3 = k;                   % 10
+
+t1 = Theta1(:, 2:end); % 25 * 400, remove thetas for bias
+t2 = Theta2(:, 2:end); % 10 * 25
+
+regTerm = (lambda / (2 * m)) * (sum(sum(t1 .^ 2)) + sum(sum(t2 .^ 2)));
+
+J = J + regTerm;
+
+
 %
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
@@ -53,6 +88,17 @@ Theta2_grad = zeros(size(Theta2));
 %         Hint: We recommend implementing backpropagation using a for-loop
 %               over the training examples if you are implementing it for the 
 %               first time.
+
+d3 = a3 - Y; % layer3 errors, 5000 x 10
+d2 = (d3 * Theta2)(:, 2:end) .* sigmoidGradient(z2); % layer 2 errors, 5000 * 25, no d2_0
+
+D2 = (1/m) * (d3' * a2); % 10 * 26, layer2 partial derivative without the reg term
+D1 = (1/m) * (d2' * a1); % 25 * 401, layer1 partial derivative without the reg term
+
+Theta1_grad = D1;
+Theta2_grad = D2;
+
+
 %
 % Part 3: Implement regularization with the cost function and gradients.
 %
@@ -62,11 +108,8 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-
-
-
-
-
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + (lambda / m) * Theta1(:, 2:end);
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + (lambda / m) * Theta2(:, 2:end);
 
 
 
